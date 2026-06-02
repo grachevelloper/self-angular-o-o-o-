@@ -1,0 +1,49 @@
+.book {
+  height: 400px;
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid gold;
+  background-color: wheat;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.status{
+  align-self: flex-end;
+  font-size: 12px;
+}
+
+
+.title{
+  font-size: 16px;
+}
+
+.nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.nav-button{
+   border: 1px solid rgb(173, 160, 85);
+   width: auto;
+   padding: 8px;
+   cursor: pointer;
+}
+
+ .nav-button_selected {
+    border-color: #222;
+    background: #222;
+    color: white;
+}

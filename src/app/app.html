@@ -1,0 +1,41 @@
+<main class="main">
+  <nav class='nav'>
+     <input
+      type="search"
+      placeholder="Search books"
+      #searchInput
+      [value]="searchQuery()"
+      (input)="searchQuery.set(searchInput.value)"
+    />
+    <button
+      (click)="setStatus('wishlist')"
+      class='nav-button'
+      [class.nav-button_selected]="selectedStatus() === 'wishlist'"
+    >
+      Вишлист
+    </button>
+    <button
+      (click)="setStatus('reading')"
+       class='nav-button'
+         [class.nav-button_selected]="selectedStatus() === 'reading'"
+    >
+      Читаю
+    </button>
+    <button
+      (click)="setStatus('finished')"
+       class='nav-button'
+         [class.nav-button_selected]="selectedStatus() === 'finished'"
+    >
+      Прочитал
+    </button>
+  </nav>
+  <div class='row'>
+    @for (book of filteredBooks(); track book.id) {
+      <div class='book'>
+        <h3 class='title'>{{book.title}}</h3>
+        <p class='author'>{{book.author}}</p>
+        <p class='status'>{{book.status}}</p>
+      </div>
+    }
+  </div>
+</main>
