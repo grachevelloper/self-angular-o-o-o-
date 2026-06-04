@@ -1,4 +1,4 @@
-import { Book } from '../types';
+import { Book } from '../model';
 
 export const BOOKS_MOCK: Book[] = [
   {

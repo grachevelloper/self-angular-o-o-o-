@@ -1,18 +1,21 @@
 import { Component, computed, signal } from '@angular/core';
-import { BOOKS_MOCK } from './mocks';
-import { Book, BookStatus } from './types';
+import { BookCardComponent } from './modules/books/components/book-card-component/book-card-component';
+import { BookFiltersComponent } from './modules/books/components/book-filters-component/book-filters-component';
+import { BOOKS_MOCK } from './modules/books/mocks';
+import { Book, BookStatus } from './modules/books/model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  imports: [BookCardComponent, BookFiltersComponent]
 })
 export class App {
   protected readonly books = signal<Book[]>(BOOKS_MOCK);
 
-  protected readonly selectedStatus = signal<BookStatus | 'all'>('all');
-
   protected readonly searchQuery = signal('');
+
+  protected readonly selectedStatus = signal<BookStatus | 'all'>('all');
 
   protected readonly filteredBooks = computed(() => {
     let filteredBooks = this.books();
@@ -36,9 +39,41 @@ export class App {
 
   });
 
-  protected setStatus(newStatus: BookStatus) {
+  protected setStatus(newStatus: BookStatus): void {
     this.selectedStatus.update((currentStatus) =>
       currentStatus === newStatus ? 'all' : newStatus
     );
   }
+
+  protected changeBookStatus(book: Book): void {
+    const { id, status } = book;
+    switch (status) {
+      case 'finished':
+        this.updateBookById(id, { status: 'wishlist' })
+        return;
+      case 'wishlist':
+        this.updateBookById(id, { status: 'reading' })
+        return;
+      case 'reading':
+        this.updateBookById(id, { status: 'finished' })
+        return;
+    }
+  }
+
+  protected updateBookById<K extends keyof Book>(
+    bookId: number,
+    updates: Pick<Book, K> | Partial<Book>
+  ): void {
+    this.books.update((list: Book[]) =>
+      list.map(currentBook =>
+        currentBook.id === bookId
+          ? { ...currentBook, ...updates }
+          : currentBook
+      )
+    )
+    return;
+  }
+
+
+
 }

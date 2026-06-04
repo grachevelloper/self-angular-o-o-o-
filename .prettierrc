@@ -1,11 +1,19 @@
 {
   "printWidth": 100,
   "singleQuote": true,
+  "bracketSameLine": false,
+  "singleAttributePerLine": true,
   "overrides": [
     {
       "files": "*.html",
       "options": {
         "parser": "angular"
+      }
+    },
+    {
+      "files": ["*.css", "*.scss", "*.sass", "*.less"],
+      "options": {
+        "parser": "css"
       }
     }
   ]

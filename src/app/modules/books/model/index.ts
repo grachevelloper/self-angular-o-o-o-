@@ -6,3 +6,5 @@ export interface Book {
   author: string;
   status: BookStatus;
 }
+
+export type BookFilter = BookStatus | 'all';

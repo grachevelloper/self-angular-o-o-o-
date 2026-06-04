@@ -1,0 +1,23 @@
+.book {
+  height: 400px;
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid gold;
+  background-color: wheat;
+}
+
+.status {
+  align-self: flex-end;
+  font-size: 12px;
+  padding: 8px;
+  background-color: yellowgreen;
+  border: none;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 16px;
+}
