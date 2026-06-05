@@ -19,4 +19,12 @@
       <h4>Книги не найдены</h4>
     }
   </div>
+  <button class='book-create-button'
+  (click)='onChangeBookModal()'
+  >Создать запись</button>
+  <app-book-creator
+    [isOpen]="isCreateBookModalOpen()"
+    (close)="onChangeBookModal()"
+    (submitBook)="onSubmitBookModal($event)"
+  />
 </main>

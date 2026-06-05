@@ -3,12 +3,13 @@ import { BookCardComponent } from './modules/books/components/book-card-componen
 import { BookFiltersComponent } from './modules/books/components/book-filters-component/book-filters-component';
 import { BOOKS_MOCK } from './modules/books/mocks';
 import { Book, BookStatus } from './modules/books/model';
+import { BookCreator, CreateBookDTO } from './modules/books/components/book-creator/book-creator';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  imports: [BookCardComponent, BookFiltersComponent]
+  imports: [BookCardComponent, BookFiltersComponent, BookCreator]
 })
 export class App {
   protected readonly books = signal<Book[]>(BOOKS_MOCK);
@@ -74,6 +75,26 @@ export class App {
     return;
   }
 
+  protected readonly isCreateBookModalOpen = signal<boolean>(false);
 
+  protected onChangeBookModal(): void {
+    this.isCreateBookModalOpen.update((current) => !current)
+    return;
+  }
+
+  protected onSubmitBookModal(newBook?: CreateBookDTO): void {
+    this.addBook(newBook);
+    this.onChangeBookModal();
+    return;
+  }
+
+
+  private addBook(newBook?: CreateBookDTO): void {
+    if(!newBook) return;
+
+    const lastId = this.books().at(-1)?.id || 0
+    this.books.update(books =>
+      [...books, {...newBook, id: lastId + 1}])
+  }
 
 }
