@@ -1,0 +1,71 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { BookCardComponent } from '../../components/book-card-component/book-card-component';
+import { BookCreator, CreateBookDTO } from '../../components/book-creator/book-creator';
+import { BookFiltersComponent } from '../../components/book-filters-component/book-filters-component';
+import { BookStatus, Book } from '../../model';
+import { BookService } from '../../services';
+import { Router } from '@angular/router';
+
+@Component({
+    selector: 'app-book-list-page',
+    imports: [BookCardComponent, BookFiltersComponent, BookCreator],
+    templateUrl: './book-list-page.html',
+    styleUrl: './book-list-page.scss',
+})
+export class BookListPage {
+    private router = inject(Router);
+
+    protected readonly booksService = inject(BookService)
+
+    protected readonly searchQuery = signal('');
+    protected readonly selectedStatus = signal<BookStatus | 'all'>('all');
+
+    protected readonly filteredBooks = computed(() => {
+        let filteredBooks = this.booksService.books();
+
+        const query = this.searchQuery().trim().toLowerCase();
+
+        const status = this.selectedStatus()
+
+        if (query) {
+            filteredBooks = filteredBooks.filter((book: Book) => {
+                return book.author.toLowerCase().includes(query) ||
+                    book.title.toLowerCase().includes(query)
+            });
+        }
+
+        if (status === 'all') {
+            return filteredBooks;
+        }
+
+        return filteredBooks.filter((book: Book) => book.status === status);
+
+    });
+
+    protected setStatus(newStatus: BookStatus): void {
+        this.selectedStatus.update((currentStatus) =>
+            currentStatus === newStatus ? 'all' : newStatus
+        );
+    }
+
+    protected changeBookStatus(book: Book): void {
+        this.booksService.changeBookStatus(book);
+    }
+
+    protected readonly isCreateBookModalOpen = signal<boolean>(false);
+
+    protected onChangeBookModal(): void {
+        this.isCreateBookModalOpen.update((current) => !current)
+        return;
+    }
+
+    protected onSubmitBookModal(newBook?: CreateBookDTO): void {
+        this.booksService.addBook(newBook);
+        this.onChangeBookModal();
+        return;
+    }
+
+    protected handleBookClick(id: number): void {
+        this.router.navigateByUrl(`/${String(id)}`)
+    }
+}

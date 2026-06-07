@@ -26,7 +26,7 @@ export class BookService {
         }
     }
 
-    public updateBookById<K extends keyof Book>(
+    public updateBookById(
         bookId: number,
         updates: Partial<Book>
     ): void {
@@ -46,6 +46,10 @@ export class BookService {
         const lastId = this.booksState().at(-1)?.id || 0
         this.booksState.update(books =>
             [...books, { ...newBook, id: lastId + 1 }])
+    }
+
+    public getBookById(id: number): Book | undefined {
+        return this.booksState().find(book => book.id === id)
     }
 
 }

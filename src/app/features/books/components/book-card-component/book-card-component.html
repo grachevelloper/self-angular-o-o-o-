@@ -1,9 +1,12 @@
-<div class="book">
+<div
+    class="book"
+    (click)="clicked.emit()"
+>
   <h3 class="title">{{ book().title }}</h3>
   <p class="author">{{ book().author }}</p>
   <button
     class="status"
-    (click)="statusClicked.emit(book())"
+   (click)="$event.stopPropagation(); statusClicked.emit(book())"
   >
     {{ book().status }}
   </button>

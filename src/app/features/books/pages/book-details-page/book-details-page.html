@@ -1,0 +1,12 @@
+<main>
+    <button (click)="handleBackClick()">Назад</button>
+    @if (!book()) {
+        <h3>Книга не найдена!</h3>
+    } @else {
+        <h3>{{book()?.title}}</h3>
+
+        <h5>{{book()?.author}}</h5>
+
+        <p>{{book()?.status}}</p>
+    }
+</main>
