@@ -23,7 +23,7 @@
   <button class='book-create-button'
   (click)='onChangeBookModal()'
   >Создать запись</button>
-  <app-book-creator
+  <app-book-creator-component
     [isOpen]="isCreateBookModalOpen()"
     (close)="onChangeBookModal()"
     (submitBook)="onSubmitBookModal($event)"

@@ -1,17 +1,17 @@
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// import { BookCreator } from './book-creator';
+// import { BookCreatorComponent } from './book-creator-component';
 
-// describe('BookCreator', () => {
-//   let component: BookCreator;
-//   let fixture: ComponentFixture<BookCreator>;
+// describe('BookCreatorComponent', () => {
+//   let component: BookCreatorComponent;
+//   let fixture: ComponentFixture<BookCreatorComponent>;
 
 //   beforeEach(async () => {
 //     await TestBed.configureTestingModule({
-//       imports: [BookCreator],
+//       imports: [BookCreatorComponent],
 //     }).compileComponents();
 
-//     fixture = TestBed.createComponent(BookCreator);
+//     fixture = TestBed.createComponent(BookCreatorComponent);
 //     component = fixture.componentInstance;
 //     await fixture.whenStable();
 //   });

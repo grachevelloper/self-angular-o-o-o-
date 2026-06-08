@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { BookCardComponent } from '../../components/book-card-component/book-card-component';
-import { BookCreator, CreateBookDTO } from '../../components/book-creator/book-creator';
+import { BookCreatorComponent, CreateBookDTO } from '../../components/book-creator-component/book-creator-component';
 import { BookFiltersComponent } from '../../components/book-filters-component/book-filters-component';
 import { BookStatus, Book } from '../../model';
 import { BookService } from '../../services';
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-book-list-page',
-    imports: [BookCardComponent, BookFiltersComponent, BookCreator],
+    imports: [BookCardComponent, BookFiltersComponent, BookCreatorComponent],
     templateUrl: './book-list-page.html',
     styleUrl: './book-list-page.scss',
 })

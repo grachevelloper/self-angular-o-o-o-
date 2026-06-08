@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { CreateBookDTO } from '../components/book-creator/book-creator';
+import { CreateBookDTO } from '../components/book-creator-component/book-creator-component';
 import { BOOKS_MOCK } from '../mocks';
 import { Book } from '../model';
 
