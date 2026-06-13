@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { type Book, type BookStatus } from '../../model';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -21,6 +21,7 @@ const VOID_STATE: CreateBookDTO = {
 })
 export class BookCreatorComponent {
     public readonly isOpen = input.required<boolean>();
+    public readonly isSubmitting = input(false);
     public readonly close = output<void>();
     public readonly submitBook = output<CreateBookDTO>();
 
@@ -40,23 +41,35 @@ export class BookCreatorComponent {
         ])
     })
 
+    private readonly resetClosedForm = effect(() => {
+        if (!this.isOpen()) {
+            this.bookForm.setValue(VOID_STATE);
+        }
+    });
+
     get title() { return this.bookForm.get('title'); }
     get author() { return this.bookForm.get('author'); }
     get status() { return this.bookForm.get('status'); }
 
     public onSubmit(): void {
         const form = this.bookForm;
+        if (this.isSubmitting()) {
+            return;
+        }
+
         if (form.valid) {
             const formData = form.getRawValue() as CreateBookDTO;
             this.submitBook.emit(formData)
-
-            this.bookForm.setValue(VOID_STATE)
         } else {
             this.bookForm.markAllAsTouched();
         }
     }
 
     protected onClose() {
+        if (this.isSubmitting()) {
+            return;
+        }
+
         this.close.emit();
         this.bookForm.setValue(VOID_STATE);
     }

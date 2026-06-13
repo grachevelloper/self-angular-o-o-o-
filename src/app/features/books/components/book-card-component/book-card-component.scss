@@ -10,13 +10,29 @@
   cursor: pointer;
 }
 
-.status {
+.status,
+.delete {
   align-self: flex-end;
   font-size: 12px;
   padding: 8px;
-  background-color: yellowgreen;
   border: none;
   cursor: pointer;
+}
+
+.status {
+  background-color: yellowgreen;
+}
+
+.delete {
+  margin-top: 8px;
+  background-color: tomato;
+  color: white;
+}
+
+.status:disabled,
+.delete:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .title {

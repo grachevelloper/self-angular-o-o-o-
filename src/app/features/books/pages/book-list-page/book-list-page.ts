@@ -18,7 +18,7 @@ export class BookListPage {
     private activatedRoute = inject(ActivatedRoute);
     private queryParamMap = toSignal(this.activatedRoute.queryParamMap);
 
-    protected readonly booksService = inject(BookService)
+    public readonly booksService = inject(BookService)
 
     protected searchQuery = computed(() => {
         return this.queryParamMap()?.get('search') ?? '';
@@ -51,7 +51,7 @@ export class BookListPage {
     protected handlChangeSearch(search: string): void {
         this.router.navigate([], {
             relativeTo: this.activatedRoute,
-            queryParams: { search, page: 1 },
+            queryParams: { search: search || null, page: 1 },
             queryParamsHandling: 'merge'
         })
     }
@@ -79,10 +79,15 @@ export class BookListPage {
         return;
     }
 
-    protected onSubmitBookModal(newBook?: CreateBookDTO): void {
-        this.booksService.addBook(newBook);
-        this.onChangeBookModal();
+    protected onSubmitBookModal(newBook: CreateBookDTO): void {
+        this.booksService.addBook(newBook).subscribe({
+            next: () => this.onChangeBookModal(),
+        });
         return;
+    }
+
+    protected deleteBook(book: Book): void {
+        this.booksService.deleteBookById(book.id).subscribe();
     }
 
     protected handleBookClick(id: number): void {

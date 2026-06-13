@@ -6,8 +6,24 @@
   <p class="author">{{ book().author }}</p>
   <button
     class="status"
-   (click)="$event.stopPropagation(); statusClicked.emit(book())"
+    [disabled]="isUpdating() || isDeleting()"
+    (click)="$event.stopPropagation(); statusClicked.emit(book())"
   >
-    {{ book().status }}
+    @if (isUpdating()) {
+      Обновляем...
+    } @else {
+      {{ book().status }}
+    }
+  </button>
+  <button
+    class="delete"
+    [disabled]="isUpdating() || isDeleting()"
+    (click)="$event.stopPropagation(); deleteClicked.emit(book())"
+  >
+    @if (isDeleting()) {
+      Удаляем...
+    } @else {
+      Удалить
+    }
   </button>
 </div>

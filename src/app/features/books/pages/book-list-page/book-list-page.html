@@ -5,29 +5,41 @@
         (statusSelected)="handleChangeStatus($event)"
         (searchChanged)="handlChangeSearch($event)"
     />
+    @if (booksService.actionError()) {
+        <p class="error">{{ booksService.actionError() }}</p>
+    }
     <div class="row">
         @let books = filteredBooks();
 
-        @if (books.length) {
+        @if (booksService.loadingBooks()) {
+            <p>Loading...</p>
+        } @else if (booksService.loadError()) {
+            <p class="error">{{ booksService.loadError() }}</p>
+        } @else if (books.length === 0) {
+            <p class="empty">Книги не найдены</p>
+        } @else {
             @for (book of books; track book.id) {
                 <app-book-card
                     [book]="book"
+                    [isUpdating]="booksService.updatingBookIds().has(book.id)"
+                    [isDeleting]="booksService.deletingBookIds().has(book.id)"
                     (clicked)="handleBookClick(book.id)"
                     (statusClicked)="changeBookStatus($event)"
+                    (deleteClicked)="deleteBook($event)"
                 />
             }
-        } @else {
-            <h4>Книги не найдены</h4>
         }
     </div>
     <button
         class="book-create-button"
+        [disabled]="booksService.creatingBook()"
         (click)="onChangeBookModal()"
     >
         Создать запись
     </button>
     <app-book-creator-component
         [isOpen]="isCreateBookModalOpen()"
+        [isSubmitting]="booksService.creatingBook()"
         (close)="onChangeBookModal()"
         (submitBook)="onSubmitBookModal($event)"
     />

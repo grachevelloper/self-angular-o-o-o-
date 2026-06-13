@@ -1,0 +1,151 @@
+import { computed, inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { catchError, defer, EMPTY, finalize, Observable, tap } from 'rxjs';
+import { CreateBookDTO, UpdateBookDTO } from '../../components/book-creator-component/book-creator-component';
+import { Book } from '../../model';
+import { BookApiService } from '../book-api-service/book-api-service';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class BookService {
+    private readonly api = inject(BookApiService);
+
+    private readonly booksState = signal<Book[]>([]);
+    private readonly updatingBookIdsState = signal<Set<number>>(new Set());
+    private readonly deletingBookIdsState = signal<Set<number>>(new Set());
+
+    public readonly books = this.booksState.asReadonly();
+    public readonly updatingBookIds = this.updatingBookIdsState.asReadonly();
+    public readonly deletingBookIds = this.deletingBookIdsState.asReadonly();
+
+    public readonly loadingBooks = signal(false);
+    public readonly creatingBook = signal(false);
+
+    public readonly loadError = signal<string | null>(null);
+    public readonly createError = signal<string | null>(null);
+    public readonly updateError = signal<string | null>(null);
+    public readonly deleteError = signal<string | null>(null);
+
+    public readonly actionError = computed(() => {
+        return this.createError() ?? this.updateError() ?? this.deleteError();
+    });
+
+    constructor() {
+        this.loadBooks();
+    }
+
+    public loadBooks(): void {
+        this.loadingBooks.set(true);
+        this.loadError.set(null);
+
+        this.api.getAll()
+            .pipe(finalize(() => this.loadingBooks.set(false)))
+            .subscribe({
+                next: (books) => this.booksState.set(books),
+                error: () => this.loadError.set('Не удалось загрузить книги'),
+            });
+    }
+
+    public changeBookStatus(book: Book): void {
+        const { id, status } = book;
+
+        switch (status) {
+            case 'finished':
+                this.updateBookById(id, { status: 'wishlist' }).subscribe();
+                return;
+            case 'wishlist':
+                this.updateBookById(id, { status: 'reading' }).subscribe();
+                return;
+            case 'reading':
+                this.updateBookById(id, { status: 'finished' }).subscribe();
+                return;
+        }
+    }
+
+    public updateBookById(
+        bookId: number,
+        updates: UpdateBookDTO
+    ): Observable<Book> {
+        return defer(() => {
+            this.updateError.set(null);
+            this.addPendingId(this.updatingBookIdsState, bookId);
+
+            return this.api.updateById(bookId, updates).pipe(
+                tap((updatedBook) => {
+                    this.booksState.update((books) =>
+                        books.map((book) => book.id === updatedBook.id ? updatedBook : book)
+                    );
+                }),
+                catchError(() => {
+                    this.updateError.set('Не удалось обновить книгу');
+                    return EMPTY;
+                }),
+                finalize(() => this.removePendingId(this.updatingBookIdsState, bookId))
+            );
+        });
+    }
+
+    public addBook(newBook: CreateBookDTO): Observable<Book> {
+        return defer(() => {
+            this.creatingBook.set(true);
+            this.createError.set(null);
+
+            return this.api.add(newBook).pipe(
+                tap((createdBook) => {
+                    this.booksState.update((books) => [...books, createdBook]);
+                }),
+                catchError(() => {
+                    this.createError.set('Не удалось создать книгу');
+                    return EMPTY;
+                }),
+                finalize(() => this.creatingBook.set(false))
+            );
+        });
+    }
+
+    public deleteBookById(bookId: number): Observable<void> {
+        return defer(() => {
+            this.deleteError.set(null);
+            this.addPendingId(this.deletingBookIdsState, bookId);
+
+            return this.api.deleteById(bookId).pipe(
+                tap(() => {
+                    this.booksState.update((books) =>
+                        books.filter((book) => book.id !== bookId)
+                    );
+                }),
+                catchError(() => {
+                    this.deleteError.set('Не удалось удалить книгу');
+                    return EMPTY;
+                }),
+                finalize(() => this.removePendingId(this.deletingBookIdsState, bookId))
+            );
+        });
+    }
+
+    public getBookById(id: number): Book | undefined {
+        return this.booksState().find((book) => book.id === id);
+    }
+
+    private addPendingId(
+        state: WritableSignal<Set<number>>,
+        id: number
+    ): void {
+        state.update((ids) => {
+            const nextIds = new Set(ids);
+            nextIds.add(id);
+            return nextIds;
+        });
+    }
+
+    private removePendingId(
+        state: WritableSignal<Set<number>>,
+        id: number
+    ): void {
+        state.update((ids) => {
+            const nextIds = new Set(ids);
+            nextIds.delete(id);
+            return nextIds;
+        });
+    }
+}
